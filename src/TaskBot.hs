@@ -44,9 +44,14 @@ processCommand cmd prevTaskList = case cmd of
   "/remove" -> cmdRemove prevTaskList
   _ -> addTask cmd prevTaskList
 
+-- | Convert a list of strings to a numbered string.
+showNumbered :: Int -> [Task] -> String
+showNumbered _ [] = ""
+showNumbered i (x: xs) = (show (i + 1)) ++ ". " ++ x ++ "\n" ++ (showNumbered (i + 1) xs)
+
 -- | Command to show tasks list.
 cmdList :: [Task] -> (String, [Task])
-cmdList tasks = (show tasks, tasks)
+cmdList tasks = (showNumbered 0 tasks, tasks)
 
 -- | Command to complete the last task.
 cmdComplete :: [Task] -> (String, [Task])
