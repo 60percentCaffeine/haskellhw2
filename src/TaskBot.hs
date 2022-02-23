@@ -41,6 +41,7 @@ processCommand :: String -> [Task] -> (String, [Task])
 processCommand cmd prevTaskList = case cmd of
   "/list" -> cmdList prevTaskList
   "/complete" -> cmdComplete prevTaskList
+  "/remove" -> cmdRemove prevTaskList
   _ -> addTask cmd prevTaskList
 
 -- | Command to show tasks list.
@@ -55,3 +56,7 @@ cmdComplete (_:xs) = (completeMsg, xs)
 -- | Add new task to tasks list.
 addTask :: String -> [Task] -> (String, [Task])
 addTask task l = (newTaskMsg, task:l)
+
+-- | Remove all tasks from the list.
+cmdRemove :: [Task] -> (String, [Task])
+cmdRemove _ = (removeMsg, [])
