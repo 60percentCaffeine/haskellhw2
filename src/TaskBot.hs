@@ -6,7 +6,7 @@ import Consts
 import System.IO
 
 type Task = String
-type UserName = String
+type Name = String
 
 -- | Run task bot.
 -- Commands:
@@ -20,27 +20,29 @@ runBot = do
   hSetBuffering stdout NoBuffering
   putStrLn namePrompt
   name <- getLine
-  go name []
+  putStrLn botNamePrompt
+  botName <- getLine
+  go name botName []
   where
     -- Helper function to interact with user and update tasks list
-    go :: UserName -> [Task] -> IO ()
-    go name taskList = do
+    go :: Name -> Name -> [Task] -> IO ()
+    go name botName taskList = do
       putStr $ name ++ "> "
       str <- getLine
       if (str == "/exit")
         then putStrLn goodbyeMsg
         else do
           -- process input unless it is an "/exit" command
-          let (output, newTaskList) = processCommand str taskList
-          putStrLn (botPrompt ++ output)
-          go name newTaskList
+          let (output, newTaskList) = processCommand botName str taskList
+          putStrLn (botName ++ botPrompt ++ output)
+          go name botName newTaskList
 
 -- | Process user input. Returns output string to be printed by bot and
 -- updated list of tasks in a tuple.
-processCommand :: String -> [Task] -> (String, [Task])
-processCommand cmd prevTaskList = case cmd of
+processCommand :: Name -> String -> [Task] -> (String, [Task])
+processCommand botName cmd prevTaskList = case cmd of
   "/list" -> cmdList prevTaskList
-  "/complete" -> cmdComplete prevTaskList
+  "/complete" -> cmdComplete botName prevTaskList
   "/remove" -> cmdRemove prevTaskList
   _ -> addTask cmd prevTaskList
 
@@ -54,9 +56,9 @@ cmdList :: [Task] -> (String, [Task])
 cmdList tasks = (showNumbered 0 tasks, tasks)
 
 -- | Command to complete the last task.
-cmdComplete :: [Task] -> (String, [Task])
-cmdComplete [] = (noTasksMsg, [])
-cmdComplete (_:xs) = (completeMsg, xs)
+cmdComplete :: Name -> [Task] -> (String, [Task])
+cmdComplete botName [] = (botName ++ noTasksMsg, [])
+cmdComplete _ (_:xs) = (completeMsg, xs)
 
 -- | Add new task to tasks list.
 addTask :: String -> [Task] -> (String, [Task])
